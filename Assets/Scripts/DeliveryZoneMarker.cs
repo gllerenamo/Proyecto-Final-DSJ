@@ -9,6 +9,11 @@ public class DeliveryZoneMarker : MonoBehaviour
     [Header("Identificación")]
     public string zoneName = "Punto de Entrega";
 
+    [Header("HUD")]
+    [Tooltip("Icono que muestra la tarjeta de pedido del HUD")]
+    [SerializeField] private Sprite icon;
+    public Sprite Icon => icon;
+
     [Header("Efecto de pulso")]
     [SerializeField] private float pulseSpeed = 3f;
     [SerializeField] private float minScale = 0.85f;

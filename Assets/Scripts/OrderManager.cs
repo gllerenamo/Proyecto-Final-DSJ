@@ -69,7 +69,11 @@ public class OrderManager : MonoBehaviour
             return;
         }
 
+        // Evita repetir el destino recién entregado: el jugador sigue dentro del radio
+        // y el nuevo pedido se completaría al instante.
         int index = UnityEngine.Random.Range(0, possibleDestinations.Length);
+        if (possibleDestinations.Length > 1 && possibleDestinations[index] == CurrentDestination)
+            index = (index + UnityEngine.Random.Range(1, possibleDestinations.Length)) % possibleDestinations.Length;
         CurrentDestination = possibleDestinations[index];
         TimeRemaining = orderTimeLimit;
         OrderActive = true;
