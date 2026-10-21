@@ -31,9 +31,20 @@ Scripts implementados y funcionales:
 - [`Assets/Scripts/DeliveryZoneMarker.cs`](Assets/Scripts/DeliveryZoneMarker.cs) — Marcador visual con efecto de pulso para zonas de entrega.
 - [`Assets/Scripts/CameraFollow2D.cs`](Assets/Scripts/CameraFollow2D.cs) — Cámara que sigue al jugador.
 - [`Assets/Scripts/CarVisuals.cs`](Assets/Scripts/CarVisuals.cs) — Ayudante visual del vehículo repartidor.
-- [`Assets/Scripts/MainMenuUI.cs`](Assets/Scripts/MainMenuUI.cs) — Menú de inicio con pausa de tiempo y soporte teclado/Escape.
+- [`Assets/Scripts/MainMenuUI.cs`](Assets/Scripts/MainMenuUI.cs) — Menú de inicio (escena `MainMenu`): Jugar carga `Nivel1`, Salir cierra; Enter/Espacio/Escape.
 
-Escena activa: `Assets/Scenes/SampleScene.unity`.
+Añadidos en el Avance 2 (Gabriel — niveles y UI):
+
+- [`Assets/Scripts/LevelManager.cs`](Assets/Scripts/LevelManager.cs) — Reglas mínimas del nivel (entregar N pedidos; si vence el tiempo, derrota). Sin UI; eventos `OnDeliveriesChanged`, `OnLevelCompleted`, `OnLevelFailed`. `LoadNextLevel()` es el gancho para HU-14.
+- [`Assets/Scripts/UI/HUDController.cs`](Assets/Scripts/UI/HUDController.cs) — Temporizador, tarjeta de pedido, entregas, mensajes y panel de fin de nivel.
+- [`Assets/Scripts/UI/DestinationArrow.cs`](Assets/Scripts/UI/DestinationArrow.cs) — Flecha al destino (borde de pantalla / sobre el punto).
+- [`Assets/Scripts/UI/MinimapController.cs`](Assets/Scripts/UI/MinimapController.cs) — Marcador del destino en el minimapa (cámara fija → RenderTexture, capa `Minimapa`).
+- [`Assets/Scripts/LevelDesign/WaypointRouteGizmo.cs`](Assets/Scripts/LevelDesign/WaypointRouteGizmo.cs) — Ruta de waypoints = hijos del GameObject en orden; modo Lineal/Cíclica/IdaVuelta. Solo gizmo; el `WaypointFollower` de Paolo lee los hijos.
+- [`Assets/Scripts/LevelDesign/LaunchZoneGizmo.cs`](Assets/Scripts/LevelDesign/LaunchZoneGizmo.cs) — Zona de lanzamiento (origen) → `Target` (zona de entrega a distancia).
+- [`Assets/Editor/ArequipaAssetGenerator*.cs`](Assets/Editor/ArequipaAssetGenerator.Nivel1.cs) — Pixel art procedural de Arequipa (menú `Arequipa/…`). Paleta de tiles: `Assets/Art/Arequipa_Palette.prefab`.
+
+Escenas (Build Settings en este orden): `Assets/Scenes/MainMenu.unity`, `Assets/Scenes/Nivel1.unity`. `SampleScene.unity` queda como sandbox fuera del build.
+Prefabs reutilizables para nuevos niveles en `Assets/Prefabs/`.
 
 ## Convenciones de código
 
@@ -54,8 +65,11 @@ PlayerController  ──(OnPlayerHonk event)──►  SeekFleeAgent
                                                     │
                                             WanderAgent (component)
 
-OrderManager  ──(events: OnTimeUpdated, OnOrderDelivered, OnOrderExpired)──►  UI scripts
-              ──(CurrentDestination property)──►  DeliveryZoneMarker / minimap
+OrderManager  ──(events: OnTimeUpdated, OnOrderDelivered, OnOrderExpired)──►  LevelManager, HUDController
+              ──(CurrentDestination property)──►  HUDController / DestinationArrow / MinimapController
+
+LevelManager  ──(OnDeliveriesChanged, OnLevelCompleted, OnLevelFailed)──►  HUDController
+              ──(GenerateNewOrder tras cada entrega)──►  OrderManager
 ```
 
 - Los sistemas se comunican vía **eventos C#** (`event Action`) para mantener bajo acoplamiento.
@@ -94,7 +108,7 @@ Nuevas HU deben acordarse entre los tres integrantes antes de ser implementadas.
 
 ## Cómo probar cambios
 
-1. Abrir `Assets/Scenes/SampleScene.unity` en Unity.
+1. Abrir `Assets/Scenes/MainMenu.unity` (flujo completo) o `Assets/Scenes/Nivel1.unity` (directo al nivel) en Unity.
 2. Asignar en el Inspector las referencias necesarias (ver `[SerializeField]` de cada script).
 3. Ejecutar con Play. El tag `"Player"` debe estar en el GameObject del repartidor.
 4. Bocina: `Space`. Movimiento: `WASD` o flechas.

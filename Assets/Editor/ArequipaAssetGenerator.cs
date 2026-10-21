@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using System.IO;
 
-public static class ArequipaAssetGenerator
+public static partial class ArequipaAssetGenerator
 {
     // === Paleta Arequipa ===
     static readonly Color32 CLEAR     = new Color32(0,   0,   0,   0  );
@@ -47,17 +47,20 @@ public static class ArequipaAssetGenerator
 
     // ── helpers ──────────────────────────────────────────────────────────
 
-    static void FillCircle(Color32[] px, int cx, int cy, int r, Color32 c, int w)
+    // h < 0 => textura cuadrada (h = w); los sprites del Avance 1 son cuadrados.
+    static void FillCircle(Color32[] px, int cx, int cy, int r, Color32 c, int w, int h = -1)
     {
-        for (int y = Mathf.Max(0, cy - r); y <= Mathf.Min(w - 1, cy + r); y++)
+        if (h < 0) h = w;
+        for (int y = Mathf.Max(0, cy - r); y <= Mathf.Min(h - 1, cy + r); y++)
         for (int x = Mathf.Max(0, cx - r); x <= Mathf.Min(w - 1, cx + r); x++)
             if ((x - cx) * (x - cx) + (y - cy) * (y - cy) <= r * r)
                 px[y * w + x] = c;
     }
 
-    static void FillEllipse(Color32[] px, int cx, int cy, int rx, int ry, Color32 c, int w)
+    static void FillEllipse(Color32[] px, int cx, int cy, int rx, int ry, Color32 c, int w, int h = -1)
     {
-        for (int y = Mathf.Max(0, cy - ry); y <= Mathf.Min(w - 1, cy + ry); y++)
+        if (h < 0) h = w;
+        for (int y = Mathf.Max(0, cy - ry); y <= Mathf.Min(h - 1, cy + ry); y++)
         for (int x = Mathf.Max(0, cx - rx); x <= Mathf.Min(w - 1, cx + rx); x++)
         {
             float dx = (float)(x - cx) / rx, dy = (float)(y - cy) / ry;
@@ -66,17 +69,19 @@ public static class ArequipaAssetGenerator
         }
     }
 
-    static void FillRect(Color32[] px, int x0, int y0, int x1, int y1, Color32 c, int w)
+    static void FillRect(Color32[] px, int x0, int y0, int x1, int y1, Color32 c, int w, int h = -1)
     {
-        for (int y = Mathf.Max(0, y0); y <= Mathf.Min(w - 1, y1); y++)
+        if (h < 0) h = w;
+        for (int y = Mathf.Max(0, y0); y <= Mathf.Min(h - 1, y1); y++)
         for (int x = Mathf.Max(0, x0); x <= Mathf.Min(w - 1, x1); x++)
             px[y * w + x] = c;
     }
 
-    static void DrawRing(Color32[] px, int cx, int cy, int r, int thick, Color32 c, int w)
+    static void DrawRing(Color32[] px, int cx, int cy, int r, int thick, Color32 c, int w, int h = -1)
     {
+        if (h < 0) h = w;
         int outer = r * r, inner = (r - thick) * (r - thick);
-        for (int y = Mathf.Max(0, cy - r); y <= Mathf.Min(w - 1, cy + r); y++)
+        for (int y = Mathf.Max(0, cy - r); y <= Mathf.Min(h - 1, cy + r); y++)
         for (int x = Mathf.Max(0, cx - r); x <= Mathf.Min(w - 1, cx + r); x++)
         {
             int d2 = (x - cx) * (x - cx) + (y - cy) * (y - cy);
@@ -91,35 +96,38 @@ public static class ArequipaAssetGenerator
         FillRect(px, cx - thick, cy - arm, cx + thick, cy + arm, c, w);
     }
 
-    static void Px(Color32[] px, int x, int y, Color32 c, int w)
+    static void Px(Color32[] px, int x, int y, Color32 c, int w, int h = -1)
     {
-        if (x >= 0 && x < w && y >= 0 && y < w) px[y * w + x] = c;
+        if (h < 0) h = w;
+        if (x >= 0 && x < w && y >= 0 && y < h) px[y * w + x] = c;
     }
 
     // Adds 1px dark outline around all opaque pixels
-    static void Outline(Color32[] px, Color32 outC, int w)
+    static void Outline(Color32[] px, Color32 outC, int w, int h = -1)
     {
+        if (h < 0) h = w;
         var copy = new Color32[px.Length];
         px.CopyTo(copy, 0);
         int[] dx = { -1, 1, 0, 0 };
         int[] dy = { 0, 0, -1, 1 };
-        for (int y = 0; y < w; y++)
+        for (int y = 0; y < h; y++)
         for (int x = 0; x < w; x++)
         {
             if (copy[y * w + x].a > 0) continue;
             for (int d = 0; d < 4; d++)
             {
                 int nx = x + dx[d], ny = y + dy[d];
-                if (nx >= 0 && nx < w && ny >= 0 && ny < w && copy[ny * w + nx].a > 0)
+                if (nx >= 0 && nx < w && ny >= 0 && ny < h && copy[ny * w + nx].a > 0)
                 { px[y * w + x] = outC; break; }
             }
         }
     }
 
-    static Texture2D NewTex(int size)
+    static Texture2D NewTex(int w, int h = -1)
     {
-        var t = new Texture2D(size, size, TextureFormat.RGBA32, false);
-        var px = new Color32[size * size];
+        if (h < 0) h = w;
+        var t = new Texture2D(w, h, TextureFormat.RGBA32, false);
+        var px = new Color32[w * h];
         for (int i = 0; i < px.Length; i++) px[i] = CLEAR;
         t.SetPixels32(px);
         return t;

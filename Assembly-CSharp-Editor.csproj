@@ -49,6 +49,7 @@
     <Analyzer Include="C:\Users\Gabriel\Documents\UNSA 2026-B\Juegos\Proyecto Final\Library\PackageCache\com.unity.pipeline@f311b58065e4\Runtime\Analyzers\IlInterpreterAnalyzer.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Editor\ArequipaAssetGenerator.Nivel1.cs" />
     <Compile Include="Assets\Editor\ArequipaAssetGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
