@@ -49907,6 +49907,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Managers
       objectReference: {fileID: 0}
+    - target: {fileID: 6517839547839534206, guid: d5ed1081e65eba0459249a51bdb01daa, type: 3}
+      propertyPath: nextLevelScene
+      value: Nivel2
+      objectReference: {fileID: 0}
     - target: {fileID: 8019974268065596828, guid: d5ed1081e65eba0459249a51bdb01daa, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
