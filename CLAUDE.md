@@ -41,9 +41,10 @@ Añadidos en el Avance 2 (Gabriel — niveles y UI):
 - [`Assets/Scripts/UI/MinimapController.cs`](Assets/Scripts/UI/MinimapController.cs) — Marcador del destino en el minimapa (cámara fija → RenderTexture, capa `Minimapa`).
 - [`Assets/Scripts/LevelDesign/WaypointRouteGizmo.cs`](Assets/Scripts/LevelDesign/WaypointRouteGizmo.cs) — Ruta de waypoints = hijos del GameObject en orden; modo Lineal/Cíclica/IdaVuelta. Solo gizmo; el `WaypointFollower` de Paolo lee los hijos.
 - [`Assets/Scripts/LevelDesign/LaunchZoneGizmo.cs`](Assets/Scripts/LevelDesign/LaunchZoneGizmo.cs) — Zona de lanzamiento (origen) → `Target` (zona de entrega a distancia).
-- [`Assets/Editor/ArequipaAssetGenerator*.cs`](Assets/Editor/ArequipaAssetGenerator.Nivel1.cs) — Pixel art procedural de Arequipa (menú `Arequipa/…`). Paleta de tiles: `Assets/Art/Arequipa_Palette.prefab`.
+- [`Assets/Editor/ArequipaAssetGenerator*.cs`](Assets/Editor/ArequipaAssetGenerator.Nivel1.cs) — Pixel art procedural de Arequipa (menú `Arequipa/Generar Sprites de Niveles y UI`). Paleta de tiles: `Assets/Art/Arequipa_Palette.prefab`.
+- [`Assets/Editor/ArequipaLevelBuilder.cs`](Assets/Editor/ArequipaLevelBuilder.cs) — Construye Nivel2/Nivel3 desde un layout en celdas (menús `Arequipa/Construir Nivel N`). **Reconstruir sobrescribe la escena**: los retoques a mano se pierden.
 
-Escenas (Build Settings en este orden): `Assets/Scenes/MainMenu.unity`, `Assets/Scenes/Nivel1.unity`. `SampleScene.unity` queda como sandbox fuera del build.
+Escenas (Build Settings en este orden): `MainMenu`, `Nivel1` (Centro Histórico), `Nivel2` (Yanahuara), `Nivel3` (Mercado San Camilo). El paso entre niveles lo define `LevelManager.nextLevelScene` (vacío en el último). `SampleScene.unity` queda como sandbox fuera del build.
 Prefabs reutilizables para nuevos niveles en `Assets/Prefabs/`.
 
 ## Convenciones de código

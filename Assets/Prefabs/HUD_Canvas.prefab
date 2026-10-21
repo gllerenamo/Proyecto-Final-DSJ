@@ -273,6 +273,7 @@ MonoBehaviour:
   deliveriesText: {fileID: 2909486303629993971}
   levelBanner: {fileID: 4227228999623186090}
   levelBannerText: {fileID: 4739028840307802320}
+  levelBannerSubtitle: {fileID: 3829136814808261760}
   bannerDuration: 2.5
   controlsHint: {fileID: 32759730939926820}
   hintDuration: 7
@@ -2155,6 +2156,7 @@ MonoBehaviour:
   distanceText: {fileID: 4900588148746538130}
   distanceLabel: {fileID: 7709179781807415661}
   edgePadding: 90
+  topPadding: 220
   hoverOffset: 90
   metersPerUnit: 5
 --- !u!1 &5801948197858792733

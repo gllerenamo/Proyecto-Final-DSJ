@@ -29,6 +29,7 @@ public class HUDController : MonoBehaviour
     [Header("Mensajes")]
     [SerializeField] private CanvasGroup levelBanner;
     [SerializeField] private TMP_Text levelBannerText;
+    [SerializeField] private TMP_Text levelBannerSubtitle;
     [SerializeField] private float bannerDuration = 2.5f;
     [SerializeField] private CanvasGroup controlsHint;
     [SerializeField] private float hintDuration = 7f;
@@ -81,6 +82,8 @@ public class HUDController : MonoBehaviour
         if (endPanel != null) endPanel.SetActive(false);
         if (toast != null) toast.alpha = 0f;
         if (levelBannerText != null) levelBannerText.text = levelManager.LevelDisplayName;
+        if (levelBannerSubtitle != null)
+            levelBannerSubtitle.text = $"Entrega {levelManager.DeliveriesToComplete} pedidos antes de que se enfríen";
         UpdateDeliveries(levelManager.DeliveriesDone, levelManager.DeliveriesToComplete);
         UpdateTimer(orderManager.TimeRemaining);
     }
@@ -99,6 +102,13 @@ public class HUDController : MonoBehaviour
         {
             toastTimer -= dt;
             toast.alpha = Mathf.Clamp01(toastTimer / 0.4f);
+        }
+
+        // Enter en el panel final: siguiente nivel si existe, si no reintentar.
+        if (endPanel != null && endPanel.activeSelf && (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)))
+        {
+            if (nextButton != null && nextButton.gameObject.activeSelf) levelManager.LoadNextLevel();
+            else levelManager.RestartLevel();
         }
 
         if (orderManager.CurrentDestination != shownDestination || !orderManager.OrderActive)
@@ -163,9 +173,14 @@ public class HUDController : MonoBehaviour
 
     private void HandleLevelCompleted()
     {
-        ShowEndPanel("¡Nivel completado!",
-            $"Entregaste {levelManager.DeliveriesDone} pedidos por el Centro Histórico.\n¡Arequipa te lo agradece, causa!",
-            levelManager.HasNextLevel);
+        if (levelManager.HasNextLevel)
+            ShowEndPanel("¡Nivel completado!",
+                $"Entregaste {levelManager.DeliveriesDone} pedidos a tiempo.\n¡Arequipa te lo agradece! Sigue el reparto.",
+                true);
+        else
+            ShowEndPanel("¡Reparto completado!",
+                "Recorriste el Centro, Yanahuara y San Camilo sin que se enfríe ni un pedido.\n¡Eres el mejor delivery de la Ciudad Blanca!",
+                false);
     }
 
     private void HandleLevelFailed()

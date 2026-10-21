@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Editor\ArequipaAssetGenerator.Nivel1.cs" />
+    <Compile Include="Assets\Editor\ArequipaLevelBuilder.cs" />
     <Compile Include="Assets\Editor\ArequipaAssetGenerator.cs" />
   </ItemGroup>
   <ItemGroup>

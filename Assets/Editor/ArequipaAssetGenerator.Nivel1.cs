@@ -3,8 +3,8 @@ using UnityEngine.Tilemaps;
 using UnityEditor;
 using UnityEditor.Tilemaps;
 
-// Sprites del Nivel 1 (Centro Histórico) y de la UI: Catedral, Santa Catalina,
-// Puente Bolognesi, San Camilo, combis, letreros y el fondo del menú con el Misti.
+// Sprites de los niveles y de la UI: Catedral, Santa Catalina, iglesias de Yanahuara y
+// San Francisco, andenes, puestos de San Camilo, combis, letreros y el fondo con el Misti.
 public static partial class ArequipaAssetGenerator
 {
     // === Paleta extendida ===
@@ -38,8 +38,8 @@ public static partial class ArequipaAssetGenerator
     const string GenFolder = "Assets/Art/Generated";
     const string PalettePath = "Assets/Art/Arequipa_Palette.prefab";
 
-    [MenuItem("Arequipa/Generar Sprites Nivel 1 (Centro Histórico)")]
-    public static void GenerateLevel1Sprites()
+    [MenuItem("Arequipa/Generar Sprites de Niveles y UI")]
+    public static void GenerateLevelSprites()
     {
         string full = Application.dataPath + "/Art/Generated/";
 
@@ -58,6 +58,12 @@ public static partial class ArequipaAssetGenerator
         GenerateFlecha(full + "ui_flecha.png");
         GenerateBlip(full + "ui_blip_jugador.png", ROJO);
         GenerateBlipDestino(full + "ui_blip_destino.png");
+        // Niveles 2 (Yanahuara) y 3 (San Camilo)
+        GenerateIglesiaYanahuara(full + "iglesia_yanahuara.png");
+        GenerateIglesiaSanFrancisco(full + "iglesia_san_francisco.png");
+        GenerateAnden(full + "tile_anden.png");
+        GeneratePuesto(full + "puesto_mercado_rojo.png", ROJO);
+        GeneratePuesto(full + "puesto_mercado_azul.png", AZUL);
 
         AssetDatabase.Refresh();
 
@@ -73,6 +79,9 @@ public static partial class ArequipaAssetGenerator
         ConfigureSprite("ui_flecha", 16, Vector4.zero);
         ConfigureSprite("ui_blip_jugador", 4, Vector4.zero);
         ConfigureSprite("ui_blip_destino", 4, Vector4.zero);
+        foreach (var n in new[] { "iglesia_yanahuara", "iglesia_san_francisco", "tile_anden", "puesto_mercado_rojo", "puesto_mercado_azul" })
+            ConfigureSprite(n, 16, Vector4.zero);
+        CreateTile("tile_anden", Tile.ColliderType.Grid);
 
         CreateTile("tile_muro_azul", Tile.ColliderType.Grid);
         CreateTile("tile_muro_ocre", Tile.ColliderType.Grid);
@@ -82,7 +91,7 @@ public static partial class ArequipaAssetGenerator
 
         BuildPalette();
         AssetDatabase.SaveAssets();
-        Debug.Log("[Arequipa] Sprites del Nivel 1 generados en " + GenFolder);
+        Debug.Log("[Arequipa] Sprites de niveles y UI generados en " + GenFolder);
     }
 
     // ── import / assets ──────────────────────────────────────────────────
@@ -134,7 +143,8 @@ public static partial class ArequipaAssetGenerator
         string[] names =
         {
             "tile_adoquin", "tile_sillar_piso", "tile_jardin_plaza", "tile_palmera", "tile_portal_arco",
-            "tile_techo_sillar", "tile_muro_azul", "tile_muro_ocre", "tile_puente_sillar", "tile_puente_baranda"
+            "tile_techo_sillar", "tile_muro_azul", "tile_muro_ocre", "tile_puente_sillar", "tile_puente_baranda",
+            "tile_anden"
         };
 
         var root = PrefabUtility.LoadPrefabContents(PalettePath);
@@ -485,6 +495,114 @@ public static partial class ArequipaAssetGenerator
             for (int y = 40; y <= top; y++)
                 px[y * W + x] = y > snowLine + ((x * 3) % 4) ? NIEVE : c;
         }
+    }
+
+    // ── NIVELES 2 Y 3 ────────────────────────────────────────────────────
+
+    // Iglesia San Juan Bautista de Yanahuara: portada de sillar tallada (estilo mestizo) y campanario.
+    static void GenerateIglesiaYanahuara(string path)
+    {
+        int W = 96, H = 80;
+        var tex = NewTex(W, H);
+        var px = tex.GetPixels32();
+
+        FillRect(px, 0, 0, 71, 50, SILLAR, W, H);
+        for (int row = 0; row <= 14; row++)
+        {
+            int hw = 36 - row * 2;
+            FillRect(px, 36 - hw, 51 + row, 35 + hw, 51 + row, SILLAR, W, H);
+        }
+        FillRect(px, 0, 49, 71, 51, SILLAR_S, W, H);
+
+        // Portada tallada: retablo de relieves alrededor de la puerta
+        FillRect(px, 18, 2, 53, 46, BLANCO, W, H);
+        for (int y = 6; y < 46; y += 4)
+        for (int x = 20; x < 52; x += 4)
+            if (((x + y) / 4) % 2 == 0) Px(px, x, y, SILLAR_S, W, H);
+        for (int x = 20; x <= 50; x += 10) FillRect(px, x, 4, x + 1, 44, SILLAR_S, W, H);
+        FillRect(px, 29, 2, 42, 22, MADERA, W, H);
+        FillCircle(px, 35, 22, 7, MADERA, W, H);
+        FillRect(px, 35, 2, 36, 26, NARANJA_O, W, H);
+        DrawRing(px, 36, 36, 4, 1, SILLAR_S, W, H);
+        Px(px, 36, 36, NEGRO, W, H);
+
+        // Campanario
+        FillRect(px, 72, 0, 95, 60, BLANCO, W, H);
+        FillRect(px, 72, 58, 95, 60, SILLAR_S, W, H);
+        FillRect(px, 74, 61, 93, 72, SILLAR, W, H);
+        FillRect(px, 79, 62, 82, 68, NEGRO, W, H); FillCircle(px, 80, 68, 2, NEGRO, W, H);
+        FillRect(px, 86, 62, 89, 68, NEGRO, W, H); FillCircle(px, 87, 68, 2, NEGRO, W, H);
+        FillEllipse(px, 83, 74, 9, 4, SILLAR, W, H);
+        FillRect(px, 83, 77, 83, 79, NEGRO, W, H);
+        FillRect(px, 81, 78, 85, 78, NEGRO, W, H);
+        FillRect(px, 80, 24, 85, 34, NEGRO, W, H);
+        FillCircle(px, 82, 34, 3, NEGRO, W, H);
+
+        Outline(px, NEGRO, W, H);
+        tex.SetPixels32(px);
+        Save(tex, path);
+    }
+
+    // Iglesia de San Francisco: sillar con cúpula de ladrillo y portada sencilla.
+    static void GenerateIglesiaSanFrancisco(string path)
+    {
+        int W = 80, H = 64;
+        var tex = NewTex(W, H);
+        var px = tex.GetPixels32();
+        FillRect(px, 0, 0, W - 1, 40, SILLAR, W, H);
+        FillRect(px, 0, 38, W - 1, 40, SILLAR_S, W, H);
+        FillEllipse(px, 54, 44, 16, 14, TERRACOTA, W, H);
+        FillEllipse(px, 50, 48, 6, 6, TERRACOTA_C, W, H);
+        FillRect(px, 52, 56, 55, 63, SILLAR, W, H);
+        FillRect(px, 4, 40, 24, 58, BLANCO, W, H);
+        FillRect(px, 10, 46, 13, 52, NEGRO, W, H); FillRect(px, 16, 46, 19, 52, NEGRO, W, H);
+        FillRect(px, 14, 58, 14, 63, NEGRO, W, H); FillRect(px, 12, 61, 16, 61, NEGRO, W, H);
+        FillRect(px, 30, 2, 49, 26, BLANCO, W, H);
+        FillRect(px, 34, 2, 45, 18, MADERA, W, H);
+        FillCircle(px, 39, 18, 6, MADERA, W, H);
+        for (int x = 6; x < W - 4; x += 12)
+        {
+            if (x > 26 && x < 52) continue;
+            FillRect(px, x, 14, x + 3, 24, NEGRO, W, H);
+            FillCircle(px, x + 1, 24, 2, NEGRO, W, H);
+        }
+        Outline(px, NEGRO, W, H);
+        tex.SetPixels32(px);
+        Save(tex, path);
+    }
+
+    // Andén de la campiña: surcos de cultivo sobre un muro de piedra.
+    static void GenerateAnden(string path)
+    {
+        int S = 16;
+        var tex = NewTex(S);
+        var px = tex.GetPixels32();
+        FillRect(px, 0, 4, 15, 15, VERDE, S);
+        for (int y = 5; y < S; y += 3) FillRect(px, 0, y, 15, y, VERDE_C, S);
+        for (int x = 1; x < S; x += 4) Px(px, x, 9, new Color32(220, 200, 80, 255), S);
+        FillRect(px, 0, 0, 15, 3, GRIS, S);
+        for (int x = 0; x < S; x += 5) FillRect(px, x, 0, x, 3, GRIS_O, S);
+        FillRect(px, 0, 3, 15, 3, GRIS_O, S);
+        tex.SetPixels32(px);
+        Save(tex, path);
+    }
+
+    // Puesto de mercado con toldo a rayas y productos.
+    static void GeneratePuesto(string path, Color32 toldo)
+    {
+        int W = 32, H = 24;
+        var tex = NewTex(W, H);
+        var px = tex.GetPixels32();
+        FillRect(px, 2, 0, 29, 9, MADERA, W, H);
+        Color32[] fruta = { NARANJA, ROJO, OCRE, VERDE_C };
+        for (int x = 4; x < 28; x += 3) FillCircle(px, x, 7, 1, fruta[(x / 3) % fruta.Length], W, H);
+        FillRect(px, 3, 9, 4, 13, MADERA, W, H); FillRect(px, 27, 9, 28, 13, MADERA, W, H);
+        for (int x = 0; x < W; x++)
+            FillRect(px, x, 13, x, 23, (x / 4) % 2 == 0 ? toldo : BLANCO, W, H);
+        for (int x = 0; x < W; x += 4) Px(px, x + 2, 12, (x / 4) % 2 == 0 ? toldo : BLANCO, W, H);
+        Outline(px, NEGRO, W, H);
+        tex.SetPixels32(px);
+        Save(tex, path);
     }
 
     // ── UI ───────────────────────────────────────────────────────────────
